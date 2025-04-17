@@ -2,235 +2,247 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Business WhatsApp Demo</title>
+  <title>WhatsApp Business Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    .app {
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       height: 100vh;
+      overflow: hidden;
     }
-
+    .app {
+      display: flex;
+      width: 100%;
+    }
     .sidebar {
-      width: 25%;
-      background-color: #ece5dd;
+      width: 30%;
+      background-color: #f0f0f0;
       padding: 10px;
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
       border-right: 1px solid #ccc;
     }
-
     .sidebar h2 {
-      margin-top: 0;
+      margin: 0 0 10px;
     }
-
-    #contact-list div {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #ccc;
-    }
-
-    .chat {
-      width: 75%;
-      display: flex;
-      flex-direction: column;
-      background: url('assets/whatsapp-bg.png') no-repeat center center;
-      background-size: cover;
-    }
-
-    .chat-header {
+    .contact {
       display: flex;
       align-items: center;
+      padding: 8px;
+      background: white;
+      margin-bottom: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .contact img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .chat-area {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      background: url('https://i.imgur.com/8rU3GZu.png') repeat;
+      background-size: cover;
+    }
+    .chat-header {
       background-color: #075e54;
       color: white;
+      display: flex;
+      align-items: center;
       padding: 10px;
     }
-
     .chat-header img {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       margin-right: 10px;
     }
-
-    .chat-messages {
+    .messages {
       flex: 1;
-      padding: 10px;
+      padding: 15px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
-
+    .message {
+      padding: 8px 12px;
+      margin: 8px 0;
+      max-width: 60%;
+      border-radius: 10px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    .sent {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+    }
+    .received {
+      background-color: white;
+      align-self: flex-start;
+    }
     .chat-input {
       display: flex;
       padding: 10px;
-      background-color: white;
+      background: #eee;
     }
-
     .chat-input input {
       flex: 1;
       padding: 10px;
+      border-radius: 20px;
       border: 1px solid #ccc;
+      outline: none;
     }
-
     .chat-input button {
-      padding: 10px;
-      background-color: #25d366;
-      color: white;
+      margin-left: 10px;
+      padding: 10px 15px;
       border: none;
+      background: #25d366;
+      color: white;
+      border-radius: 50%;
       cursor: pointer;
     }
-
-    /* Modal Styles */
+    .add-contact {
+      margin-top: auto;
+      padding: 10px;
+      text-align: center;
+      background-color: #ddd;
+      cursor: pointer;
+    }
     .modal {
-      display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
+      display: none;
       justify-content: center;
       align-items: center;
+      background: rgba(0,0,0,0.5);
     }
-
     .modal-content {
       background: white;
       padding: 20px;
+      border-radius: 5px;
       width: 300px;
+    }
+    .modal-content input {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="sidebar">
-      <h2>Contacts</h2>
-      <div id="contact-list"></div>
-      <button onclick="showAddContactForm()">+ Add Contact</button>
-    </div>
-    <div class="chat">
-      <div class="chat-header">
-        <img id="chat-dp" src="assets/default-dp.png" alt="DP" />
-        <span id="chat-name">Select a contact</span>
-      </div>
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="chat-input">
-        <input type="text" id="message-input" placeholder="Type a message..." />
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
+<div class="app">
+  <div class="sidebar">
+    <h2>Contacts</h2>
+    <div id="contact-list"></div>
+    <div class="add-contact" onclick="openModal()">+ Add Contact</div>
   </div>
 
-  <!-- Add Contact Modal -->
-  <div class="modal" id="add-contact-modal">
-    <div class="modal-content">
-      <h3>Add Contact</h3>
-      <input type="text" id="contact-name" placeholder="Name" />
-      <input type="file" id="contact-dp" accept="image/*" />
-      <button onclick="addContact()">Save</button>
-      <button onclick="hideAddContactForm()">Cancel</button>
+  <div class="chat-area">
+    <div class="chat-header">
+      <img id="chat-dp" src="https://i.imgur.com/3G3wDEn.png" />
+      <strong id="chat-name">Select a contact</strong>
+    </div>
+    <div class="messages" id="chat-messages"></div>
+    <div class="chat-input">
+      <input type="text" id="message-input" placeholder="Type a message..." />
+      <button onclick="sendMessage()">➤</button>
     </div>
   </div>
+</div>
 
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<!-- Modal -->
+<div class="modal" id="contact-modal">
+  <div class="modal-content">
+    <h3>Add Contact</h3>
+    <input type="text" id="new-name" placeholder="Contact Name" />
+    <input type="file" id="new-dp" accept="image/*" />
+    <button onclick="addContact()">Save</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+</div>
 
-  <script>
-    // 🔐 Firebase Config - Replace with your own project details
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "your-project.firebaseapp.com",
-      projectId: "your-project",
-      storageBucket: "your-project.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      databaseURL: "https://your-project.firebaseio.com"
+<script>
+  let contacts = [];
+  let currentContact = null;
+  const chatMessages = document.getElementById("chat-messages");
+
+  function openModal() {
+    document.getElementById("contact-modal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("contact-modal").style.display = "none";
+  }
+
+  function addContact() {
+    const name = document.getElementById("new-name").value.trim();
+    const file = document.getElementById("new-dp").files[0];
+    if (!name) return alert("Enter a name");
+    const reader = new FileReader();
+    reader.onload = function () {
+      const dp = reader.result || 'https://i.imgur.com/3G3wDEn.png';
+      const contact = { id: Date.now(), name, dp, messages: [] };
+      contacts.push(contact);
+      renderContacts();
+      closeModal();
     };
+    if (file) reader.readAsDataURL(file);
+    else reader.onload();
+  }
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const storage = firebase.storage();
+  function renderContacts() {
+    const list = document.getElementById("contact-list");
+    list.innerHTML = "";
+    contacts.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "contact";
+      div.innerHTML = `<img src="${c.dp}" /><span>${c.name}</span>`;
+      div.onclick = () => openChat(c);
+      list.appendChild(div);
+    });
+  }
 
-    let selectedContactId = null;
+  function openChat(contact) {
+    currentContact = contact;
+    document.getElementById("chat-name").textContent = contact.name;
+    document.getElementById("chat-dp").src = contact.dp;
+    renderMessages();
+  }
 
-    function showAddContactForm() {
-      document.getElementById('add-contact-modal').style.display = 'flex';
-    }
+  function renderMessages() {
+    chatMessages.innerHTML = "";
+    if (!currentContact) return;
+    currentContact.messages.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "message " + m.type;
+      div.textContent = m.text;
+      chatMessages.appendChild(div);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 
-    function hideAddContactForm() {
-      document.getElementById('add-contact-modal').style.display = 'none';
-    }
+  function sendMessage() {
+    const input = document.getElementById("message-input");
+    const text = input.value.trim();
+    if (!text || !currentContact) return;
+    currentContact.messages.push({ text, type: 'sent' });
+    renderMessages();
+    input.value = '';
 
-    function addContact() {
-      const name = document.getElementById('contact-name').value;
-      const file = document.getElementById('contact-dp').files[0];
-      const contactId = Date.now().toString();
-
-      if (file) {
-        const storageRef = storage.ref('dps/' + contactId);
-        storageRef.put(file).then(snapshot => {
-          snapshot.ref.getDownloadURL().then(url => {
-            saveContact(contactId, name, url);
-          });
-        });
-      } else {
-        saveContact(contactId, name, 'assets/default-dp.png');
-      }
-
-      hideAddContactForm();
-    }
-
-    function saveContact(id, name, dpUrl) {
-      db.ref('contacts/' + id).set({ name, dp: dpUrl });
-    }
-
-    function loadContacts() {
-      db.ref('contacts').on('value', snapshot => {
-        const contacts = snapshot.val();
-        const list = document.getElementById('contact-list');
-        list.innerHTML = '';
-
-        for (let id in contacts) {
-          const contact = contacts[id];
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${contact.name}</strong>`;
-          div.onclick = () => openChat(id, contact);
-          list.appendChild(div);
-        }
-      });
-    }
-
-    function openChat(id, contact) {
-      selectedContactId = id;
-      document.getElementById('chat-name').textContent = contact.name;
-      document.getElementById('chat-dp').src = contact.dp;
-
-      const messagesDiv = document.getElementById('chat-messages');
-      messagesDiv.innerHTML = '';
-
-      db.ref('messages/' + id).on('value', snapshot => {
-        messagesDiv.innerHTML = '';
-        const messages = snapshot.val();
-        for (let msgId in messages) {
-          const msg = messages[msgId];
-          const p = document.createElement('p');
-          p.textContent = msg.text;
-          messagesDiv.appendChild(p);
-        }
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-    }
-
-    function sendMessage() {
-      const input = document.getElementById('message-input');
-      const text = input.value.trim();
-      if (text && selectedContactId) {
-        const msgId = Date.now().toString();
-        db.ref(`messages/${selectedContactId}/${msgId}`).set({ text });
-        input.value = '';
-      }
-    }
-
-    loadContacts();
-  </script>
+    // Simulate reply
+    setTimeout(() => {
+      currentContact.messages.push({ text: "👍 Got it!", type: 'received' });
+      renderMessages();
+    }, 700);
+  }
+</script>
 </body>
 </html>
