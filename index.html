@@ -1,40 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WhatsApp UI Clone</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #fff;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    .whatsapp-header {
-      background-color: #075E54;
-      color: white;
-      padding: 15px 20px;
-      font-size: 20px;
+    body {
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      background: #fff;
+      color: #111;
     }
 
-    .tabs {
+    .header {
+      background-color: #075E54;
+      padding: 15px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .filters {
       display: flex;
       justify-content: space-around;
-      padding: 10px 0;
-      background-color: #f0f0f0;
+      background: #f6f6f6;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
     }
 
-    .tabs button {
-      background-color: white;
-      border: none;
-      padding: 8px 15px;
+    .filters span {
+      background: #fff;
+      padding: 6px 14px;
       border-radius: 15px;
       font-size: 14px;
-      cursor: pointer;
       color: #075E54;
-      font-weight: bold;
+      font-weight: 500;
+      box-shadow: 0 0 1px rgba(0,0,0,0.1);
+      cursor: pointer;
     }
 
     .chat-list {
@@ -44,127 +51,180 @@
     .chat {
       display: flex;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
+      padding: 12px 10px;
+      border-bottom: 1px solid #efefef;
+      position: relative;
     }
 
-    .dp {
-      width: 50px;
-      height: 50px;
+    .chat img {
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      margin-right: 10px;
       object-fit: cover;
+      margin-right: 12px;
     }
 
-    .chat-info {
+    .chat-details {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
 
-    .name-time {
+    .chat-top {
       display: flex;
       justify-content: space-between;
-      font-weight: bold;
-      color: #333;
+      margin-bottom: 5px;
     }
 
-    .message {
+    .name {
+      font-weight: bold;
+      color: #111;
+    }
+
+    .time {
+      font-size: 12px;
+      color: gray;
+    }
+
+    .chat-message {
       font-size: 14px;
-      color: #666;
-      margin-top: 5px;
+      color: #555;
+      display: flex;
+      align-items: center;
+    }
+
+    .muted::after {
+      content: "🔕";
+      margin-left: 5px;
+    }
+
+    .unread-count {
+      position: absolute;
+      right: 10px;
+      bottom: 15px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 6px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .ticks {
+      margin-right: 5px;
+      font-size: 12px;
+      color: #4fc3f7;
+    }
+
+    .group {
+      font-weight: bold;
+      color: #075E54;
     }
   </style>
 </head>
 <body>
-  <div class="whatsapp-header">
-    WhatsApp
-  </div>
 
-  <div class="tabs">
-    <button>All</button>
-    <button>Unread</button>
-    <button>Favorites</button>
-    <button>Groups</button>
+  <div class="header">WhatsApp</div>
+
+  <div class="filters">
+    <span>All</span>
+    <span>Unread</span>
+    <span>Favorites</span>
+    <span>Groups</span>
   </div>
 
   <div class="chat-list">
+
+    <!-- Jacob (You) - Pinned -->
     <div class="chat">
-      <img src="img.1.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
-          <span class="name">Jacob (You)</span>
+      <img src="img.1.png" alt="Jacob">
+      <div class="chat-details">
+        <div class="chat-top">
+          <span class="name">Jacob (You) 📌</span>
           <span class="time">18:50</span>
         </div>
-        <div class="message">When I’m in a good mood, I never for...</div>
+        <div class="chat-message">
+          <span class="ticks">✓✓</span> When I’m in a good mood, I never for...
+        </div>
       </div>
     </div>
 
+    <!-- Wife -->
     <div class="chat">
-      <img src="img.2.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
+      <img src="img.2.png" alt="Wife">
+      <div class="chat-details">
+        <div class="chat-top">
           <span class="name">Wife ❤️🔔❤️🔔</span>
           <span class="time">20:28</span>
         </div>
-        <div class="message">Na Mbona ulitaka nimcall??</div>
+        <div class="chat-message">Na Mbona ulitaka nimcall??</div>
       </div>
+      <div class="unread-count">4</div>
     </div>
 
-    <div class="chat">
-      <img src="img.3.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
+    <!-- +254 700 566064 -->
+    <div class="chat muted">
+      <img src="img.3.png" alt="Contact">
+      <div class="chat-details">
+        <div class="chat-top">
           <span class="name">+254 700 566064</span>
           <span class="time">20:46</span>
         </div>
-        <div class="message">📷 Photo</div>
+        <div class="chat-message">📷 Photo</div>
       </div>
     </div>
 
+    <!-- +254 778 304140 -->
     <div class="chat">
-      <img src="img.4.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
+      <img src="img.4.png" alt="Contact">
+      <div class="chat-details">
+        <div class="chat-top">
           <span class="name">+254 778 304140</span>
           <span class="time">20:46</span>
         </div>
-        <div class="message">Nisawa tu sababu sinako Cha kufanya, nil...</div>
+        <div class="chat-message">
+          <span class="ticks">✓✓</span> Nisawa tu sababu sinako Cha kufanya, nil...
+        </div>
       </div>
     </div>
 
+    <!-- Bro Abedy -->
     <div class="chat">
-      <img src="img.5.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
+      <img src="img.5.png" alt="Bro Abedy">
+      <div class="chat-details">
+        <div class="chat-top">
           <span class="name">Bro Abedy❤️</span>
           <span class="time">17:39</span>
         </div>
-        <div class="message">fine inlaw</div>
+        <div class="chat-message">fine inlaw</div>
       </div>
     </div>
 
+    <!-- SALAMA CENTER -->
     <div class="chat">
-      <img src="img.6.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
-          <span class="name">SALAMA CENTER 5TH STREET 2ND...</span>
+      <img src="img.6.png" alt="Salama">
+      <div class="chat-details">
+        <div class="chat-top">
+          <span class="name group">SALAMA CENTER 5TH STREET 2ND...</span>
           <span class="time">19</span>
         </div>
-        <div class="message">2xl extra 🔥💖</div>
+        <div class="chat-message">📢 2xl extra 🔥💖</div>
       </div>
+      <div class="unread-count">19</div>
     </div>
 
+    <!-- Misty Jeana -->
     <div class="chat">
-      <img src="img.7.png" alt="DP" class="dp">
-      <div class="chat-info">
-        <div class="name-time">
+      <img src="img.7.png" alt="Misty">
+      <div class="chat-details">
+        <div class="chat-top">
           <span class="name">Misty Jeana</span>
           <span class="time">✓✓</span>
         </div>
-        <div class="message">Yeeee</div>
+        <div class="chat-message">Yeeee</div>
       </div>
     </div>
+
   </div>
 </body>
 </html>
