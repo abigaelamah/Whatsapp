@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Business WhatsApp Demo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 25%;
+      background-color: #ece5dd;
+      padding: 10px;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+    }
+
+    #contact-list div {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .chat {
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      background: url('assets/whatsapp-bg.png') no-repeat center center;
+      background-size: cover;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      background-color: #075e54;
+      color: white;
+      padding: 10px;
+    }
+
+    .chat-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background-color: white;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .chat-input button {
+      padding: 10px;
+      background-color: #25d366;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <h2>Contacts</h2>
+      <div id="contact-list"></div>
+      <button onclick="showAddContactForm()">+ Add Contact</button>
+    </div>
+    <div class="chat">
+      <div class="chat-header">
+        <img id="chat-dp" src="assets/default-dp.png" alt="DP" />
+        <span id="chat-name">Select a contact</span>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Contact Modal -->
+  <div class="modal" id="add-contact-modal">
+    <div class="modal-content">
+      <h3>Add Contact</h3>
+      <input type="text" id="contact-name" placeholder="Name" />
+      <input type="file" id="contact-dp" accept="image/*" />
+      <button onclick="addContact()">Save</button>
+      <button onclick="hideAddContactForm()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+  <script>
+    // 🔐 Firebase Config - Replace with your own project details
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "your-project.firebaseapp.com",
+      projectId: "your-project",
+      storageBucket: "your-project.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      databaseURL: "https://your-project.firebaseio.com"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    let selectedContactId = null;
+
+    function showAddContactForm() {
+      document.getElementById('add-contact-modal').style.display = 'flex';
+    }
+
+    function hideAddContactForm() {
+      document.getElementById('add-contact-modal').style.display = 'none';
+    }
+
+    function addContact() {
+      const name = document.getElementById('contact-name').value;
+      const file = document.getElementById('contact-dp').files[0];
+      const contactId = Date.now().toString();
+
+      if (file) {
+        const storageRef = storage.ref('dps/' + contactId);
+        storageRef.put(file).then(snapshot => {
+          snapshot.ref.getDownloadURL().then(url => {
+            saveContact(contactId, name, url);
+          });
+        });
+      } else {
+        saveContact(contactId, name, 'assets/default-dp.png');
+      }
+
+      hideAddContactForm();
+    }
+
+    function saveContact(id, name, dpUrl) {
+      db.ref('contacts/' + id).set({ name, dp: dpUrl });
+    }
+
+    function loadContacts() {
+      db.ref('contacts').on('value', snapshot => {
+        const contacts = snapshot.val();
+        const list = document.getElementById('contact-list');
+        list.innerHTML = '';
+
+        for (let id in contacts) {
+          const contact = contacts[id];
+          const div = document.createElement('div');
+          div.innerHTML = `<strong>${contact.name}</strong>`;
+          div.onclick = () => openChat(id, contact);
+          list.appendChild(div);
+        }
+      });
+    }
+
+    function openChat(id, contact) {
+      selectedContactId = id;
+      document.getElementById('chat-name').textContent = contact.name;
+      document.getElementById('chat-dp').src = contact.dp;
+
+      const messagesDiv = document.getElementById('chat-messages');
+      messagesDiv.innerHTML = '';
+
+      db.ref('messages/' + id).on('value', snapshot => {
+        messagesDiv.innerHTML = '';
+        const messages = snapshot.val();
+        for (let msgId in messages) {
+          const msg = messages[msgId];
+          const p = document.createElement('p');
+          p.textContent = msg.text;
+          messagesDiv.appendChild(p);
+        }
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+      if (text && selectedContactId) {
+        const msgId = Date.now().toString();
+        db.ref(`messages/${selectedContactId}/${msgId}`).set({ text });
+        input.value = '';
+      }
+    }
+
+    loadContacts();
+  </script>
+</body>
+</html>
